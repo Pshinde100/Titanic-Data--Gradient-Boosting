@@ -1,0 +1,74 @@
+---
+title: "Titanic Data- Gradient Boosting"
+author: "pranit shide"
+date: "28 November 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r }
+
+titanic <- na.omit(read.csv("C:\\Users\\pranit\\Documents\\Imarticus\\titanic.csv"))
+head(titanic)
+
+```
+
+```{r }
+summary(titanic)
+```
+
+```{r }
+str(titanic)
+```
+
+```{r }
+titanic$Survived = factor(titanic$Survived)
+titanic$Pclass = factor(titanic$Pclass)
+
+```
+
+```{r }
+library(ISLR)
+library(ggplot2)
+library(caret)
+
+inTrain <- createDataPartition(y = titanic$Survived, p = 0.7, list = F)
+train <- titanic[inTrain,]
+test <- titanic[-inTrain,]
+```
+
+## Fitting the model
+
+```{r }
+modeFit <- train(Survived ~., method = "gbm", data = train, verbose = F,  
+                 na.action = na.exclude)
+modeFit
+print(modeFit)
+```
+
+```{r }
+pred <- predict(modeFit, newdata = test)
+pred
+
+pred1 <- predict(modeFit, newdata = train)
+pred1
+
+table(pred,test$Survived)
+table(pred1, train$Survived)
+
+confusionMatrix(pred, test$Survived)
+confusionMatrix(pred1, train$Survived)
+
+```
+
